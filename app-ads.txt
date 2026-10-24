@@ -1,0 +1,2 @@
+# AdMob 게시자 ID(pub-로 시작하는 16자리)를 받으면 아래 줄 맨 앞의 #을 지우고 pub- 뒤를 바꾼다.
+# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
