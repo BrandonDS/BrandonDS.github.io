@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>TokTok Block Challenge</title>
+<meta name="description" content="A friend sent you a TokTok Block challenge">
+<style>
+  :root { --bg: #19214d; --card: #232c63; --inset: #141a3d; --text: #eef0fa; --muted: #aab1d6; --accent: #ffd43b; --go: #3fbf4a; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(110% 60% at 50% -10%, rgba(125, 150, 255, 0.45), transparent 65%), linear-gradient(#2b3b82, var(--bg) 55%, #10152f);
+    color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  }
+  main { width: min(440px, 100%); padding: 32px 16px; text-align: center; }
+  img { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); }
+  h1 { margin: 18px 0 2px; font-size: 26px; }
+  p { margin: 0 0 8px; color: var(--muted); }
+  .score { margin: 16px 0; padding: 14px 12px; border-radius: 20px; background: var(--inset); }
+  .score small { display: block; color: var(--muted); }
+  .score b { display: block; font-size: 48px; line-height: 1.1; color: #fff; }
+  .btn { display: block; margin: 10px 0 0; padding: 14px 16px; border-radius: 16px; background: var(--card); color: var(--text); font-weight: 700; text-decoration: none; }
+  .btn.go { background: var(--go); color: #fff; box-shadow: 0 4px 0 #2a8a33; }
+  .btn:hover { outline: 2px solid var(--accent); }
+  .hint { margin-top: 18px; font-size: 14px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <img src="../toktok-block/icon.png" alt="TokTok Block icon">
+  <h1 id="title"></h1>
+  <p id="info"></p>
+  <div class="score" id="scoreBox" hidden><small id="beat"></small><b id="score"></b></div>
+  <a class="btn go" id="open" hidden></a>
+  <a class="btn" id="store" href="https://play.google.com/store/apps/details?id=com.toktokblock.game"></a>
+  <p class="hint" id="hint"></p>
+</main>
+<script>
+  // 도전장 링크(앱의 src/challenge.ts가 만든다)를 앱이 없는 곳에서 연 경우의 안내.
+  // 안드로이드면 '앱에서 도전하기'가 같은 주소를 toktokblock://c/ 로 앱에 넘기고, 앱이 없으면 Play 스토어로 간다.
+  const WORDS = {
+    ko: { title: '도전장이 왔어요!', from: n => `${n}님이 보낸 톡톡 블록 도전장`, friend: '친구가 보낸 톡톡 블록 도전장', beat: '넘어야 할 점수',
+      open: '앱에서 도전하기', store: 'Google Play에서 받기', hint: '앱을 설치한 뒤 이 링크를 다시 눌러 주세요.', other: '안드로이드 폰에서 이 링크를 열어 주세요.', bad: '도전장 링크가 잘린 것 같아요.' },
+    en: { title: "You've been challenged!", from: n => `A TokTok Block challenge from ${n}`, friend: 'A friend sent you a TokTok Block challenge', beat: 'Score to beat',
+      open: 'Accept in the app', store: 'Get it on Google Play', hint: 'After installing the app, tap this link again.', other: 'Open this link on an Android phone.', bad: 'This challenge link looks cut off.' },
+    ja: { title: '挑戦状が届きました！', from: n => `${n}さんからのTokTok Block挑戦状`, friend: '友だちからのTokTok Block挑戦状', beat: '超えるスコア',
+      open: 'アプリで挑戦する', store: 'Google Playで入手', hint: 'アプリをインストールしたら、このリンクをもう一度タップしてください。', other: 'Androidスマホでこのリンクを開いてください。', bad: '挑戦状のリンクが途切れているようです。' },
+    zh: { title: '收到挑戰書了！', from: n => `${n}送來的 TokTok Block 挑戰書`, friend: '朋友送來的 TokTok Block 挑戰書', beat: '要超越的分數',
+      open: '在 App 中接受挑戰', store: '在 Google Play 下載', hint: '安裝 App 後，請再點一次這個連結。', other: '請用 Android 手機開啟這個連結。', bad: '挑戰書連結好像不完整。' },
+  };
+  const tag = (navigator.language || 'en').toLowerCase();
+  const lang = ['ko', 'ja', 'zh'].find(l => tag.startsWith(l)) || 'en';
+  const w = WORDS[lang];
+  document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : lang;
+  const $ = id => document.getElementById(id);
+  const q = new URLSearchParams(location.search);
+  const ok = /^\d{8}$/.test(q.get('d') || '') && !!q.get('m');
+  const name = (q.get('n') || '').slice(0, 20);
+  const score = Number(q.get('s'));
+  $('title').textContent = w.title;
+  $('info').textContent = !ok ? w.bad : name ? w.from(name) : w.friend;
+  if (ok) {
+    const d = q.get('d');
+    $('info').textContent += ` · ${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6)}`;
+  }
+  if (ok && Number.isFinite(score) && score > 0) {
+    $('scoreBox').hidden = false;
+    $('beat').textContent = w.beat;
+    $('score').textContent = score.toLocaleString();
+  }
+  $('store').textContent = w.store;
+  const android = /android/i.test(navigator.userAgent);
+  if (ok && android) {
+    const store = $('store').href;
+    $('open').hidden = false;
+    $('open').textContent = w.open;
+    $('open').href = `intent://c/${location.search}#Intent;scheme=toktokblock;package=com.toktokblock.game;`
+      + `S.browser_fallback_url=${encodeURIComponent(store)};end`;
+    $('hint').textContent = w.hint;
+  } else if (ok) {
+    $('hint').textContent = w.other;
+  }
+</script>
+</body>
+</html>

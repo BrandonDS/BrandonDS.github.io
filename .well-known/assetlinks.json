@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.toktokblock.game",
+      "sha256_cert_fingerprints": [
+        "FA:CA:A6:1E:14:AF:FB:B7:AB:7D:FE:89:EE:B6:1D:7E:99:34:B5:61:F6:BC:C2:EF:4E:BB:97:8B:50:62:C9:28",
+        "25:44:1D:C6:B8:DA:94:48:76:DB:A1:93:67:16:75:A4:D1:35:8E:2B:CD:BA:75:62:08:E4:F9:EB:D1:73:A7:60"
+      ]
+    }
+  }
+]
